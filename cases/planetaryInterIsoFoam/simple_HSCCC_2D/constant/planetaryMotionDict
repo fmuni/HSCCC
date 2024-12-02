@@ -1,0 +1,32 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2406                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      planetaryMotion;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+
+//- Solar radius [m]
+R 	        0.1;
+
+//- Rotation speed [RMP]
+omega	    800;
+
+//- Phase of the motion [rad]
+phase	    0;
+    
+//- Time for ramp effect (reaches full omega at rampTime) [s]
+rampTime    0.15; 
+
+
+// ************************************************************************* //
