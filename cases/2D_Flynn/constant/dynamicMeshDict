@@ -106,15 +106,17 @@ localCode
 
 code
 #{
-    const scalar omega0 = 800; // RPM
-    const scalar t_su = 0;// 0.1;
-    const scalar t_sd = 5;//4.9;
+    const scalar omega0RPM = 800; // RPM
+    const scalar t_su =  0.1;
+    const scalar t_sd =  4.9;
     const scalar t_sd_end = 5.0; // Allows to continue the simulation at 0 RPM
     const vector solarCenter = vector(-0.1,0,0);
     const vector planetInitialCenter = vector(0,0,0);
     
     const Time& tm = mesh().time();
     const pointField& p0 = points0();
+    
+    const scalar omega0 = omega0RPM/60.;
     
     const scalar omega = Omega
     (
@@ -125,6 +127,8 @@ code
         //mesh().time().endTime().value()
         t_sd_end
     );
+    
+    Info << "Planetary motion: omega = " << omega << "\n";
 
     // Solar rotation angle
     const scalar solarAngle =

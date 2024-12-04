@@ -1,0 +1,12 @@
+#!/bin/sh
+cd "${0%/*}" || exit                                # Run from this directory
+. ${WM_PROJECT_DIR:?}/bin/tools/runFunctions      # Tutorial run functions
+#------------------------------------------------------------------------------
+
+./preprocessing
+
+cp system/fvSolution.interIsoFoam system/fvSolution
+
+runParallel interIsoFoam
+
+#------------------------------------------------------------------------------
