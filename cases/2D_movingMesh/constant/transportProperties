@@ -10,23 +10,13 @@ FoamFile
     version     2.0;
     format      ascii;
     class       dictionary;
-    location    "constant";
-    object      planetaryMotion;
+    object      transportProperties;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+transportModel  Newtonian;
 
-//- Solar radius [m]
-R 	        0.1;
-
-//- Rotation speed [RMP]
-omega	    800;
-
-//- Phase of the motion [rad]
-phase	    0;
-    
-//- Time for ramp effect (reaches full omega at rampTime) [s]
-rampTime    0.15; 
+nu              1.5e-05;
 
 
 // ************************************************************************* //

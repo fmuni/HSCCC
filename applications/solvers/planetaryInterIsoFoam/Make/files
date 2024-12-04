@@ -1,3 +1,0 @@
-planetaryInterIsoFoam.C
-
-EXE = $(FOAM_USER_APPBIN)/planetaryInterIsoFoam

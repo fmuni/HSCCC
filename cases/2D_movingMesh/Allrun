@@ -3,13 +3,10 @@ cd "${0%/*}" || exit                                # Run from this directory
 . ${WM_PROJECT_DIR:?}/bin/tools/RunFunctions        # Tutorial run functions
 #------------------------------------------------------------------------------
 
-restore0Dir
+canCompile || exit 0    # Dynamic code
 
-runApplication ideasUnvToFoam HSCCC_simple_mesh.unv
+runApplication ideasUnvToFoam ../resources/geometry/2D_Flynn.unv
 
-runApplication createPatch -overwrite
+runApplication $(getApplication)
 
-runApplication decomposePar -force
-
-runApplication reconstructPar
 #------------------------------------------------------------------------------
