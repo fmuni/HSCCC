@@ -29,26 +29,20 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Application
-    interIsoFoam
-
-Group
-    grpMultiphaseSolvers
+    speciesTransportIsoFoam
 
 Description
-    Solver derived from interFoam for two incompressible, isothermal immiscible
-    fluids using the isoAdvector phase-fraction based interface capturing
-    approach, with optional mesh motion and mesh topology changes including
-    adaptive re-meshing.
+    Solver based on interIsoFoam for solving problems where two immiscible
+    carrier fluids exchange species with different solubility. The differece
+    in dissolution is modeled as an Henry jump condition. 
 
     Reference:
     \verbatim
-        Roenby, J., Bredmose, H. and Jasak, H. (2016).
-        A computational method for sharp interface advection
-        Royal Society Open Science, 3
-        doi 10.1098/rsos.160405
+        Deising D., Marschall H., Bothe D. (2016).
+        A unified single-field model framework for Volume-Of-Fluid simulations 
+        of interfacial species transfer applied to bubbly flows.
+        Chemical Engineering Scinece, DOI:10.1016/j.ces.2015.06.021
     \endverbatim
-
-    isoAdvector code supplied by Johan Roenby, STROMNING (2018)
 
 \*---------------------------------------------------------------------------*/
 
@@ -73,11 +67,9 @@ int main(int argc, char *argv[])
 {
     argList::addNote
     (
-        "Solver for two incompressible, isothermal immiscible fluids"
-        " using isoAdvector phase-fraction based interface capturing.\n"
-        "With optional mesh motion and mesh topology changes including"
-        " adaptive re-meshing.\n"
-        "The solver is derived from interFoam"
+        "Solver based on interIsoFoam for solving problems where two immiscible"
+        " carrier fluids exchange species with different solubility. The differece.\n"
+        "n dissolution is modeled as an Henry jump condition. "
     );
 
     #include "postProcess.H"
@@ -171,6 +163,7 @@ int main(int argc, char *argv[])
             }
 
             #include "UEqn.H"
+            #include "cEqn.H"
 
             // --- Pressure corrector loop
             while (pimple.correct())

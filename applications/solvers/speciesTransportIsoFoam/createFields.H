@@ -133,3 +133,86 @@ mesh.setFluxRequired(alpha1.name());
 #include "createPorosity.H"
 
 isoAdvection advector(alpha1, phi, U);
+
+//- List of species
+List<word> specieNames(mixture.get<List<word>>("species"));
+
+//- Pointers to species fields, diffusion coefficients, and Henry constants
+PtrList<volScalarField>     cPtr(specieNames.size());
+PtrList<dimensionedScalar>  D1Ptr(specieNames.size()); // phase 1
+PtrList<dimensionedScalar>  D2Ptr(specieNames.size()); // phase 2
+PtrList<dimensionedScalar>  HPtr(specieNames.size());
+
+forAll(cPtr,ci)
+{
+    Info << "Reading specie " << specieNames[ci] << endl;
+
+    //- Read specie dictionary
+    const dictionary cDict(mixture.subDict(specieNames[ci]));
+
+    //- Create specie field
+    cPtr.set
+    (
+        ci,
+        new volScalarField
+        (
+            IOobject
+            (
+                specieNames[ci],
+                runTime.timeName(),
+                mesh,
+                IOobject::MUST_READ,
+                IOobject::AUTO_WRITE
+            ),
+            mesh
+        )
+    );
+
+    //- Init according to dictionary
+    scalar initPhase1 = cDict.get<scalar>("initValue." + mixture.phase1Name());
+    scalar initPhase2 = cDict.get<scalar>("initValue." + mixture.phase2Name());
+
+    volScalarField& c = cPtr[ci];
+    forAll(c, cellI)
+    {
+        c[cellI] = alpha1[cellI]*initPhase1 + alpha2[cellI]*initPhase2;
+    }
+    c.correctBoundaryConditions();
+
+    //- Read diffusion coefficients
+    D1Ptr.set
+    (
+        ci,
+        new dimensionedScalar
+        (
+            "D." + mixture.phase1Name(),
+            dimViscosity,
+            cDict.get<scalar>("D." + mixture.phase1Name())
+        )
+    );
+
+    D2Ptr.set
+    (
+        ci,
+        new dimensionedScalar
+        (
+            "D." + mixture.phase2Name(),
+            dimViscosity,
+            cDict.get<scalar>("D." + mixture.phase2Name())
+        )
+    );
+
+    //- Read Henry constant
+    HPtr.set
+    (
+        ci,
+        new dimensionedScalar
+        (
+            "H",
+            dimless,
+            cDict.get<scalar>("H")
+        )
+    );
+
+}
+
