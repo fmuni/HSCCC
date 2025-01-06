@@ -90,7 +90,7 @@ namespace Foam
     using namespace speciesTransferModels;
 
         // From multi phase (const rho) to multi phase (const rho)
-        makeInterfaceContSpecieMixtureType
+        makeSpecieInterfaceSpecieMixtures
         (
             kineticallyLimitedPartitioning,
             heRhoThermo,

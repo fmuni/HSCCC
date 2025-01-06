@@ -95,7 +95,7 @@ protected:
         const phasePair& pair_;
 
         //- Names of the transferring specie
-        word speciesName_;
+        wordList speciesNames_;
 
         //- Reference to mesh
         const fvMesh& mesh_;
@@ -148,7 +148,7 @@ public:
     // Member Functions
 
         //- Return the transferring species name
-        const word transferSpecie() const;
+        const wordList transferSpecie() const;
 
         //- The phase pair
         const phasePair& pair() const;
@@ -221,6 +221,9 @@ public:
 
         //- Returns the variable on which the model is based
         const word& variable() const;
+        
+        //- Returns the source term for single-specie mass transfer
+        virtual tmp<volScalarField> vdotSpecie(word specieName) const = 0;
 };
 
 

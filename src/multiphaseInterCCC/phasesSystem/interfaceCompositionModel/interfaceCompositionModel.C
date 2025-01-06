@@ -72,7 +72,7 @@ Foam::multiphaseInter::interfaceCompositionModel::interfaceCompositionModel
     ),
     includeVolChange_(dict.getOrDefault("includeVolChange", true)),
     pair_(pair),
-    speciesName_(dict.getOrDefault<word>("species", "none")),
+    speciesNames_(dict.getOrDefault<wordList>("species", wordList() )),
     mesh_(pair_.from().mesh())
 {}
 
@@ -118,10 +118,10 @@ Foam::multiphaseInter::interfaceCompositionModel::New
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-const Foam::word Foam::multiphaseInter::interfaceCompositionModel
+const Foam::wordList Foam::multiphaseInter::interfaceCompositionModel
 ::transferSpecie() const
 {
-    return speciesName_;
+    return speciesNames_;
 }
 
 

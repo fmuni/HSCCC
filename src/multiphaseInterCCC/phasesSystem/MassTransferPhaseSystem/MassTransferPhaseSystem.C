@@ -93,7 +93,7 @@ Foam::MassTransferPhaseSystem<BasePhaseSystem>::calculateL
         this->mesh(),
         dimensionedScalar(dimEnergy/dimMass, Zero)
     );
-    auto& L = tL.ref();
+/*    auto& L = tL.ref();
 
     if (massTransferModels_.found(keyik))
     {
@@ -117,7 +117,7 @@ Foam::MassTransferPhaseSystem<BasePhaseSystem>::calculateL
         const word species(speciesName.substr(0, speciesName.find('.')));
 
         L -= pos(dmdtNetki)*interfacePtr->L(species, T);
-    }
+    } */
 
     return tL;
 }
@@ -686,13 +686,13 @@ void Foam::MassTransferPhaseSystem<BasePhaseSystem>::massSpeciesTransfer
     // Fill the volumetric mass transfer for species
     forAllConstIters(massTransferModels_, iter)
     {
-        if (iter()->transferSpecie() + "." + phase.name() == speciesName)
-        {
-            // Explicit source
-            Su +=
-                  this->Su()[phase.name()]
-                + this->Sp()[phase.name()]*phase.oldTime();
-        }
+
+        tmp<volScalarField> vdott = iter()->vdotSpecie(speciesName);
+    	
+    	if(vdott.valid())
+    	{
+    	    Su += vdott.ref();
+    	}
     }
 }
 

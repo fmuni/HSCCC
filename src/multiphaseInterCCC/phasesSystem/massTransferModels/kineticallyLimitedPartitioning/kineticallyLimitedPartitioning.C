@@ -104,8 +104,25 @@ Foam::speciesTransferModels::kineticallyLimitedPartitioning<Thermo, OtherThermo>
         this->mesh_,
         dimensionedScalar(dimDensity/dimTime, Zero)
     ),
-    Tactivate_("Tactivate", dimTemperature, 0, dict)
-{}
+    Tactivate_("Tactivate", dimTemperature, 0, dict),
+    Sexp_(2*this->transferSpecie().size())
+{
+    wordList species = this->transferSpecie();
+    forAll(Sexp_,specieI)
+    {
+        Sexp_.set
+        (
+            specieI,
+            volScalarField::New
+            (
+                "Sexp." + species[specieI],
+                IOobject::NO_REGISTER,
+                this->mesh_,
+                dimensionedScalar(dimDensity/dimTime, Zero)
+            )
+        );
+    }
+}
 
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
@@ -119,14 +136,34 @@ Foam::speciesTransferModels::kineticallyLimitedPartitioning<Thermo, OtherThermo>
 )
 {
 
-    const word speciesName(IOobject::member(this->transferSpecie()));
-
-    const volScalarField& Yfrom = this->fromThermo_.composition().Y(speciesName + "." + this->pair().from().name());
-    const volScalarField& Yto = this->toThermo_.composition().Y(speciesName + "." + this->pair().to().name());
-
+    const wordList speciesNames(this->transferSpecie());
     updateInterface(T);
+    mDotc_ *= 0.;
+    const volScalarField from
+    (
+        clamp(this->pair().from(), zero_one{})
+    );
+    
+    forAll(speciesNames, specieI)
+    {
+        word speciesName = speciesNames[specieI];
+        const volScalarField& Yfrom = this->fromThermo_.composition().Y(speciesName + "." + this->pair().from().name());
+        const volScalarField& Yto = this->toThermo_.composition().Y(speciesName + "." + this->pair().to().name());
 
-    mDotc_ = kL_ * interfaceArea_ * ( Yto - K_ * Yfrom );
+        // Sexp is the volumetric source term for the species.
+        // Here "to" is the mobile phase and "from" is the stationary phase. The partition coefficient is 
+        // defined as K = Yto/Ytfrom at equilibrium.
+        // The first line in the formula comes from the conversion from surface integral to volumetric term
+        // The second line is the model equation.
+        // The last line ensures that phase from does not acquire mass from phase to.
+        Sexp_[specieI] = from
+                        * kL_ * interfaceArea_ * ( Yto - K_ * Yfrom ) 
+                        * pos( K_ * Yfrom - Yto );
+                        
+        mDotc_ += this->pair().from().rho() * Sexp_[specieI]; // Multiply by rho to convert to mass source term
+        
+
+    }
 
     return tmp<volScalarField>::New(mDotc_);
 }
@@ -155,6 +192,32 @@ KSu
 )
 {
     return nullptr;
+}
+
+template<class Thermo, class OtherThermo>
+Foam::tmp<Foam::volScalarField>
+Foam::speciesTransferModels::kineticallyLimitedPartitioning<Thermo, OtherThermo>::
+vdotSpecie(word specieName) const
+{
+
+    const wordList speciesNames(this->transferSpecie());
+    
+    forAll(speciesNames, specieI)
+    {
+        // Ensure consistency between phases
+        if(specieName == speciesNames[specieI] + "." + this->pair().from().name())
+        {
+            return tmp<volScalarField>::New(Sexp_[specieI]);
+        }
+        
+        if(specieName == speciesNames[specieI] + "." + this->pair().to().name())
+        {
+            return tmp<volScalarField>::New(-Sexp_[specieI]);
+        }                
+    }
+    
+    return nullptr;
+
 }
 
 

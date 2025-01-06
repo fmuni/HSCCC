@@ -142,6 +142,9 @@ class kineticallyLimitedPartitioning
 
         //- Update interface
         void updateInterface(const volScalarField& T);
+        
+        // Explicit source terms for each specie
+        PtrList<volScalarField> Sexp_;        
 
 
 public:
@@ -198,6 +201,8 @@ public:
         {
             return true;
         }
+        
+	virtual tmp<volScalarField> vdotSpecie(word specieName) const;
 };
 
 
