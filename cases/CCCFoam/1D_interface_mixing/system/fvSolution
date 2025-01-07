@@ -1,0 +1,120 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2406                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+    "alpha.*"
+    {
+        solver          PBiCGStab;
+        preconditioner  DILU;
+        tolerance       1e-08;
+        relTol          0.0;
+
+        cAlphas          ((stationary and mobile) 1);
+
+        nAlphaCorr      3;
+        nAlphaSubCycles 5;
+
+        // Compressiion factor for species in each alpha phase
+        // NOTE: It should be similar to cAlpha
+        cYi             2;
+        nYiSubCycles 5;
+    }
+
+    p_rgh
+    {
+        solver          GAMG;
+        smoother  DIC;
+        tolerance       1e-09;
+        relTol          0.02;
+        maxIter 20;
+    }
+
+    p_rghFinal
+    {
+        $p_rgh;
+        relTol          0;
+
+    }
+
+    "pcorr.*"
+    {
+        $p_rgh;
+    }
+
+    "U.*"
+    {
+        solver          GAMG;
+        smoother        symGaussSeidel;
+        tolerance       1e-06;
+        relTol          0;
+    }
+
+    "Yi.*"
+    {
+        solver          GAMG;
+        smoother        symGaussSeidel;
+        tolerance       1e-09;
+        relTol          0;
+        residualAlpha   1e-6;
+    }
+
+    "T.*"
+    {
+        solver          PBiCGStab;
+        preconditioner  DILU;
+        tolerance       1e-08;
+        relTol          0.01;
+    }
+
+    "mDotSmear.*"
+    {
+        solver          PBiCGStab;
+        preconditioner  DIC;
+        tolerance       1e-08;
+        relTol          0.0;
+    }
+
+    "Xc.*"
+    {
+        solver          PBiCGStab;
+        preconditioner  DILU;
+        tolerance       1e-08;
+        relTol          0.0;
+    }
+}
+
+PIMPLE
+{
+    momentumPredictor   yes;
+    nOuterCorrectors    1;
+    nCorrectors         5;
+    nNonOrthogonalCorrectors 0;
+}
+
+relaxationFactors
+{
+    fields
+    {
+    }
+    equations
+    {
+        ".*"     0.99;
+    }
+}
+
+
+// ************************************************************************* //

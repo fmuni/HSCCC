@@ -76,7 +76,7 @@ Foam::speciesTransferModels::kineticallyLimitedPartitioning<Thermo, OtherThermo>
 :
     InterfaceCompositionModel<Thermo, OtherThermo>(dict, pair),
     isoAlpha_(dict.getOrDefault<scalar>("isoAlpha", 0.5)),
-    kL_("kL", dimless/dimTime/dimArea, dict),
+    kL_("kL", dimLength/dimTime, dict),
     K_("K", dimless, dict),
     interfaceArea_
     (
@@ -105,7 +105,7 @@ Foam::speciesTransferModels::kineticallyLimitedPartitioning<Thermo, OtherThermo>
         dimensionedScalar(dimDensity/dimTime, Zero)
     ),
     Tactivate_("Tactivate", dimTemperature, 0, dict),
-    Sexp_(2*this->transferSpecie().size())
+    Sexp_(this->transferSpecie().size())
 {
     wordList species = this->transferSpecie();
     forAll(Sexp_,specieI)
@@ -122,6 +122,40 @@ Foam::speciesTransferModels::kineticallyLimitedPartitioning<Thermo, OtherThermo>
             )
         );
     }
+    
+    //- Check if species exist
+    const PtrList<volScalarField>& Yfrom = this->fromThermo_.composition().Y();
+    const PtrList<volScalarField>& Yto = this->toThermo_.composition().Y();
+    forAll(species,specieI)
+    {
+        bool found = false;
+
+        forAll(Yfrom,Yi)
+        {
+            if(Yfrom[Yi].name() == species[specieI] + "." + this->pair().from().name())
+            {
+                found = true;
+            }
+        }
+
+        forAll(Yto,Yi)
+        {
+            if(Yto[Yi].name() == species[specieI] + "." + this->pair().to().name())
+            {
+                found = true;
+            }
+        }
+        
+        if(!found)
+        {
+            FatalErrorInFunction << "Species " << species[specieI] << " must be present in both phases." << exit(FatalError);
+        }
+
+
+    }
+
+    
+
 }
 
 
@@ -147,20 +181,50 @@ Foam::speciesTransferModels::kineticallyLimitedPartitioning<Thermo, OtherThermo>
     forAll(speciesNames, specieI)
     {
         word speciesName = speciesNames[specieI];
-        const volScalarField& Yfrom = this->fromThermo_.composition().Y(speciesName + "." + this->pair().from().name());
-        const volScalarField& Yto = this->toThermo_.composition().Y(speciesName + "." + this->pair().to().name());
+        word speciesNameFrom = speciesName + "." + this->pair().from().name(); 
+        word speciesNameTo = speciesName + "." + this->pair().to().name();  
+        const PtrList<volScalarField>& Ysfrom = this->fromThermo_.composition().Y();
+        const PtrList<volScalarField>& Ysto = this->toThermo_.composition().Y();    
+        
+        label idFrom = -1;
+        label idTo = -1;
+        
+        forAll(this->fromThermo_.composition().Y(),Yi)
+        {
+            if(Ysfrom[Yi].name() == speciesName + "." + this->pair().from().name())
+            {
+                idFrom = Yi;
+                break;
+            }
+        }
+        forAll(this->toThermo_.composition().Y(),Yi)
+        {
+            if(Ysto[Yi].name() == speciesName + "." + this->pair().to().name())
+            {
+                idTo = Yi;
+                break;
+            }
+        }
 
-        // Sexp is the volumetric source term for the species.
+        if(idFrom == -1 || idTo == -1)
+        {
+            FatalErrorInFunction << "Species " << speciesName << " must be present in both phases." << exit(FatalError);
+        }        
+
+        const volScalarField& Yfrom = Ysfrom[idFrom];
+        const volScalarField& Yto = Ysto[idTo];
+
+        // Sexp is the mass source term for the species.
         // Here "to" is the mobile phase and "from" is the stationary phase. The partition coefficient is 
         // defined as K = Yto/Ytfrom at equilibrium.
         // The first line in the formula comes from the conversion from surface integral to volumetric term
         // The second line is the model equation.
         // The last line ensures that phase from does not acquire mass from phase to.
-        Sexp_[specieI] = from
+        Sexp_[specieI] = this->pair().from().rho() * from
                         * kL_ * interfaceArea_ * ( Yto - K_ * Yfrom ) 
                         * pos( K_ * Yfrom - Yto );
                         
-        mDotc_ += this->pair().from().rho() * Sexp_[specieI]; // Multiply by rho to convert to mass source term
+        mDotc_ +=  Sexp_[specieI]; // Multiply by rho to convert to mass source term
         
 
     }
@@ -207,12 +271,12 @@ vdotSpecie(word specieName) const
         // Ensure consistency between phases
         if(specieName == speciesNames[specieI] + "." + this->pair().from().name())
         {
-            return tmp<volScalarField>::New(Sexp_[specieI]);
+            return tmp<volScalarField>::New(Sexp_[specieI]/this->pair().from().rho() );
         }
         
         if(specieName == speciesNames[specieI] + "." + this->pair().to().name())
         {
-            return tmp<volScalarField>::New(-Sexp_[specieI]);
+            return tmp<volScalarField>::New(-Sexp_[specieI]/this->pair().from().rho());
         }                
     }
     
