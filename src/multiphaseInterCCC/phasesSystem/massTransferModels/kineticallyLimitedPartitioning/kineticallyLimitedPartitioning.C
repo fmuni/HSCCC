@@ -169,7 +169,6 @@ Foam::speciesTransferModels::kineticallyLimitedPartitioning<Thermo, OtherThermo>
     const volScalarField& T
 )
 {
-
     const wordList speciesNames(this->transferSpecie());
     updateInterface(T);
     mDotc_ *= 0.;
@@ -224,7 +223,7 @@ Foam::speciesTransferModels::kineticallyLimitedPartitioning<Thermo, OtherThermo>
                         * kL_ * interfaceArea_ * ( Yto - K_ * Yfrom ) 
                         * pos( K_ * Yfrom - Yto );
                         
-        mDotc_ +=  Sexp_[specieI]; // Multiply by rho to convert to mass source term
+        mDotc_ +=  Sexp_[specieI];
         
 
     }

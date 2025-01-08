@@ -45,7 +45,7 @@ massTransferModel
     {
         type                kineticallyLimitedPartitioning;
         species             (c);
-        kL                  0.1;
+        kL                  0.01;
         K                   2;
         Tactivate           372;
    }

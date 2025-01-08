@@ -53,7 +53,8 @@ MultiComponentPhaseModel
     BasePhaseModel(fluid, phaseName),
     species_(),
     inertIndex_(-1),
-    addDiffusion_(false)
+    addDiffusion_(false),
+    zeroOnOtherPhase_(false)
 {
     thermoPtr_.reset
     (
@@ -82,6 +83,9 @@ MultiComponentPhaseModel
     Sct_ = thermoPtr_().template getOrDefault<scalar>("Sct", 1.0);
 
     X_.setSize(thermoPtr_->composition().species().size());
+
+    zeroOnOtherPhase_ =
+        thermoPtr_().template getOrDefault<bool>("forceZeroOnOtherPhase", false);
 
     // Initiate X's using Y's to set BC's
     forAll(species_, i)
@@ -423,6 +427,11 @@ void Foam::MultiComponentPhaseModel<BasePhaseModel, phaseThermo>::solveYi
                 YiDiffEqn.solve("diffusion" + Yi.name());
             }
 
+            if(zeroOnOtherPhase_)
+            {
+                Yi *= pos(alpha1 - 0.01);
+            }
+            
             Yt += Yi;
         }
     }

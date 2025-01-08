@@ -30,8 +30,8 @@ solvers
 
         // Compressiion factor for species in each alpha phase
         // NOTE: It should be similar to cAlpha
-        cYi             2;
-        nYiSubCycles 5;
+        cYi             1;
+        //nYiSubCycles 5;
     }
 
     p_rgh
@@ -99,7 +99,7 @@ solvers
 
 PIMPLE
 {
-    momentumPredictor   yes;
+    momentumPredictor   no;
     nOuterCorrectors    1;
     nCorrectors         5;
     nNonOrthogonalCorrectors 0;

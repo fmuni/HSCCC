@@ -79,6 +79,9 @@ protected:
         //- Schmidt number
         scalar Sct_;
 
+        //- Zero Y on other phase
+        bool zeroOnOtherPhase_;
+
 
     // Protected functions
 

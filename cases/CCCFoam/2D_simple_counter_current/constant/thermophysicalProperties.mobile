@@ -32,6 +32,7 @@ species
 );
 
 inertSpecie organic;
+forceZeroOnOtherPhase true;
 
 organic
 {
@@ -77,6 +78,7 @@ c
         Pr              6.62;
         mu              959e-6;
     }
+
 }
 
 
