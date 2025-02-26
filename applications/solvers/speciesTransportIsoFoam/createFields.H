@@ -168,17 +168,20 @@ forAll(cPtr,ci)
         )
     );
 
-    //- Init according to dictionary
-    scalar initPhase1 = cDict.get<scalar>("initValue." + mixture.phase1Name());
-    scalar initPhase2 = cDict.get<scalar>("initValue." + mixture.phase2Name());
-
-    volScalarField& c = cPtr[ci];
-    forAll(c, cellI)
+    if ( cDict.found("initValue." + mixture.phase1Name()) )
     {
-        c[cellI] = alpha1[cellI]*initPhase1 + alpha2[cellI]*initPhase2;
+        //- Init according to dictionary
+        scalar initPhase1 = cDict.get<scalar>("initValue." + mixture.phase1Name());
+        scalar initPhase2 = cDict.get<scalar>("initValue." + mixture.phase2Name());
+    
+        volScalarField& c = cPtr[ci];
+        forAll(c, cellI)
+        {
+            c[cellI] = alpha1[cellI]*initPhase1 + alpha2[cellI]*initPhase2;
+        }
+        c.correctBoundaryConditions();
     }
-    c.correctBoundaryConditions();
-
+    
     //- Read diffusion coefficients
     D1Ptr.set
     (
