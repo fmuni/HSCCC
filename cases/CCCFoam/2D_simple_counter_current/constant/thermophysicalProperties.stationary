@@ -32,7 +32,7 @@ species
 );
 
 inertSpecie water;
-forceZeroOnOtherPhase true;
+forceZeroOnOtherPhase false;
 
 
 water
@@ -58,16 +58,16 @@ water
     }
 }
 
-c
+c // methanol
 {
     specie
     {
         nMoles          1;
-        molWeight       18.9;
+        molWeight       32.04;
     }
     equationOfState
     {
-        rho             558.4;
+        rho             792;
     }
     thermodynamics
     {
@@ -79,7 +79,7 @@ c
         Pr              6.62;
         mu              959e-6;
     }
-}
 
+}
 
 // ************************************************************************* //

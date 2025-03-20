@@ -31,7 +31,7 @@ actions
         type    faceSet;
         action  new;
         source  boxToFace;
-        box     (0.1999999999 0.015 -1)(1 1 1);
+        box     (0.3999999999 0.015 -1)(1 1 1);
     }
 
 );

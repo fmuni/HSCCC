@@ -16,8 +16,8 @@ FoamFile
 
 defaultFieldValues
 (
-    volScalarFieldValue alpha.stationary 0
-    volScalarFieldValue alpha.mobile 1
+    volScalarFieldValue alpha.stationary 1
+    volScalarFieldValue alpha.mobile 0
     volScalarFieldValue water.stationary 1
     volScalarFieldValue organic.mobile 1
     volScalarFieldValue c.stationary 0
@@ -28,15 +28,21 @@ regions
 (
     boxToCell
     {
-        box (-1 -1 -1) (100 0.01 1);
+        box (-1 0.015 -1) (100 1 1);
         fieldValues
         (
-            volScalarFieldValue alpha.stationary 1
-            volScalarFieldValue alpha.mobile 0
-           // volScalarFieldValue water.stationary 0.9
-          // volScalarFieldValue organic.mobile 0
+            volScalarFieldValue alpha.stationary 0
+            volScalarFieldValue alpha.mobile 1
+        );
+    }
+
+    boxToCell
+    {
+        box (-1 -1 -1) (0.012 0.010 1);
+        fieldValues
+        (
             volScalarFieldValue c.stationary 0.1
-            //volScalarFieldValue c.mobile 0
+            volScalarFieldValue water.stationary 0.9
         );
     }
 );

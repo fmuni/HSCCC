@@ -22,13 +22,13 @@ startTime       0;
 
 stopAt          endTime;
 
-endTime         100;
+endTime         200;
 
 deltaT          1e-7;
 
 writeControl    adjustableRunTime;
 
-writeInterval   0.1;
+writeInterval   1;
 
 purgeWrite      0;
 
@@ -54,6 +54,30 @@ maxAlphaDdt     1;
 
 functions
 {
+
+    outletValues
+    {
+        writeControl    timeStep;
+        writeInterval   1;
+
+        // Mandatory entries (unmodifiable)
+        type            surfaceFieldValue;
+        libs            (fieldFunctionObjects);
+
+        // Mandatory entries (runtime modifiable)
+        fields          (c.mobile alpha.stationary);
+        operation       areaAverage;
+        regionType      patch;
+        name            outlet;
+        writeFields true;
+
+
+        postOperation   none;
+        scaleFactor     1.0;
+        writeArea       true;
+        surfaceFormat   none;
+    }
+
 
 }
 

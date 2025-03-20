@@ -73,6 +73,9 @@ protected:
         //- Ptr list of volumetric fractions for species
         PtrList<volScalarField> X_;
 
+        //- Ptr list of density (mass per cell volume) for species
+        PtrList<volScalarField> rhoY_;
+
         //- Add diffusion transport on Yi's Eq
         bool addDiffusion_;
 

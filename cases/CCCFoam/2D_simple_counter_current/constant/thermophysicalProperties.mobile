@@ -32,18 +32,18 @@ species
 );
 
 inertSpecie organic;
-forceZeroOnOtherPhase true;
+forceZeroOnOtherPhase false;
 
-organic
+organic // ethanol
 {
     specie
     {
         nMoles          1;
-        molWeight       18.9;
+        molWeight       46.068;
     }
     equationOfState
     {
-        rho             758.4;
+        rho             789.4;
     }
     thermodynamics
     {
@@ -57,16 +57,16 @@ organic
     }
 }
 
-c
+c // methanol
 {
     specie
     {
         nMoles          1;
-        molWeight       18.9;
+        molWeight       32.04;
     }
     equationOfState
     {
-        rho             558.4;
+        rho             792;
     }
     thermodynamics
     {

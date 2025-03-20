@@ -131,9 +131,6 @@ int main(int argc, char *argv[])
                 }
             }
 
-            #include "YEqns.H"
-            #include "TEqn.H"
-
             if (pimple.frozenFlow())
             {
                 continue;
@@ -151,6 +148,9 @@ int main(int argc, char *argv[])
             {
                 turbulence->correct();
             }
+
+            #include "YEqns.H"
+            #include "TEqn.H"
         }
 
         rho = fluid.rho();

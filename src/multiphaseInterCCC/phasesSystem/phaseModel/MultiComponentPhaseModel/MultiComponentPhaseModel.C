@@ -83,7 +83,8 @@ MultiComponentPhaseModel
     Sct_ = thermoPtr_().template getOrDefault<scalar>("Sct", 1.0);
 
     X_.setSize(thermoPtr_->composition().species().size());
-
+    rhoY_.setSize(thermoPtr_->composition().species().size());
+    
     zeroOnOtherPhase_ =
         thermoPtr_().template getOrDefault<bool>("forceZeroOnOtherPhase", false);
 
@@ -104,6 +105,24 @@ MultiComponentPhaseModel
                     IOobject::NO_WRITE
                 ),
                 Y()[i]
+            )
+        );
+
+        rhoY_.set
+        (
+            i,
+            new volScalarField
+            (
+                IOobject
+                (
+                    IOobject::groupName("rho" + species_[i], phaseName),
+                    fluid.mesh().time().timeName(),
+                    fluid.mesh(),
+                    IOobject::NO_READ,
+                    IOobject::AUTO_WRITE
+                ),
+                fluid.mesh(),
+                dimensionedScalar("rhoY",dimDensity,0.)
             )
         );
     }
@@ -158,6 +177,11 @@ void Foam::MultiComponentPhaseModel<BasePhaseModel, phaseThermo>
     }
     X_[inertIndex_] = 1.0 - Xtotal;
     X_[inertIndex_].correctBoundaryConditions();
+
+    forAll(rhoY_, i)
+    {
+        rhoY_[i] = Y()[i] * this->rho();
+    }
 }
 
 
@@ -171,6 +195,11 @@ calculateMassFractions()
         W += X_[i]*thermo().composition().W(i);
     }
 
+    forAll(rhoY_, i)
+    {
+        rhoY_[i] = Y()[i] * this->rho();
+    }
+    
     forAll(Y(), i)
     {
         Y()[i] = X_[i]*thermo().composition().W(i)/W;
@@ -178,8 +207,10 @@ calculateMassFractions()
         Info<< Y()[i].name() << " mass fraction = "
             << "  Min(Y) = " << min(Y()[i]).value()
             << "  Max(Y) = " << max(Y()[i]).value()
+            << "  Total mass = " << gSum( W.mesh().V() * Y()[i].primitiveField() * this->rho()().primitiveField())
             << endl;
     }
+    
 }
 
 

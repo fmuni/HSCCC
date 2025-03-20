@@ -25,22 +25,23 @@ solvers
 
         cAlphas          ((stationary and mobile) 1);
 
-        nAlphaCorr      3;
+        nAlphaCorr      1;
         nAlphaSubCycles 5;
 
         // Compressiion factor for species in each alpha phase
         // NOTE: It should be similar to cAlpha
         cYi             1;
-        //nYiSubCycles 5;
+        nYiSubCycles 5;
     }
 
     p_rgh
     {
-        solver          GAMG;
+        solver         GAMG;
         smoother  DIC;
+        preconditioner DIC;
         tolerance       1e-09;
-        relTol          0.02;
-        maxIter 20;
+        //relTol          0.02;
+        maxIter 50;
     }
 
     p_rghFinal
@@ -66,6 +67,7 @@ solvers
     "Yi.*"
     {
         solver          GAMG;
+        preconditioner DILU;
         smoother        symGaussSeidel;
         tolerance       1e-09;
         relTol          0;
@@ -101,20 +103,22 @@ PIMPLE
 {
     momentumPredictor   no;
     nOuterCorrectors    1;
-    nCorrectors         5;
+    nCorrectors         12;
     nNonOrthogonalCorrectors 0;
 }
-
+/*
 relaxationFactors
 {
     fields
     {
+        p_rgh 0.3;
+        p_rghFinal 1;
     }
     equations
     {
         ".*"     0.99;
     }
-}
+} */
 
 
 // ************************************************************************* //
