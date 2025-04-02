@@ -1,6 +1,9 @@
 
 #include "processorPolyPatch.H"
 
+namespace Foam
+{
+
 void bulkInterpolate
 (
     const volScalarField& C,
@@ -236,6 +239,63 @@ void syncProcPatches
     surfaceCellFacesOnProcPatches.clear();
     pFaceValues.clear();
     requiresNeighbData.clear();
+}
+
+void phaseAverageInterpolate
+(
+    const volScalarField& C,
+    const volScalarField& alpha,
+    const boolList& interfaceCells,
+    const surfaceScalarField& alphaf,
+    const surfaceScalarField& alphaPhi,
+    surfaceScalarField& Cf
+)
+{
+    const fvMesh& mesh = Cf.mesh();
+    const polyBoundaryMesh& boundaryMesh = mesh.boundaryMesh();
+    const labelUList& owner = mesh.owner();
+    const labelUList& neighbour = mesh.neighbour();
+    forAll(interfaceCells, cellI)
+    {
+        labelList interfaces = mesh.cells()[cellI];
+        if (interfaceCells[cellI] == 1)
+        {
+            forAll(interfaces, faceI)
+            {
+                if (mesh.isInternalFace(interfaces[faceI]))
+                {
+                    const scalar COwn = C[owner[interfaces[faceI]]];
+                    const scalar CNei = C[neighbour[interfaces[faceI]]];
+                    const scalar alphaOwn = alpha[owner[interfaces[faceI]]];
+                    const scalar alphaNei = alpha[neighbour[interfaces[faceI]]];
+                    const scalar alphafaceI = alphaf[interfaces[faceI]];
+                    const scalar alphaPhiFaceI = alphaPhi[interfaces[faceI]];
+                    Cf.primitiveFieldRef()[interfaces[faceI]] = interpolateFaceConcentrationOnFaceI(alphafaceI, COwn, CNei, alphaOwn, alphaNei, alphaPhiFaceI);
+                }
+                else
+                {
+                    const label patchI = boundaryMesh.whichPatch(interfaces[faceI]);        // index of the patch to which faceI belongs to
+                    const label bfaceI = boundaryMesh[patchI].whichFace(interfaces[faceI]); // - mesh.nInternalFaces(); // local faceI index
+                    if (Cf.boundaryField()[patchI].coupled())
+                    {
+                        const scalar COwn = C.boundaryField()[patchI].patchInternalField()()[bfaceI];
+                        const scalar CNei = C.boundaryField()[patchI].patchNeighbourField()()[bfaceI];
+                        const scalar alphaOwn = alpha.boundaryField()[patchI].patchInternalField()()[bfaceI];
+                        const scalar alphaNei = alpha.boundaryField()[patchI].patchNeighbourField()()[bfaceI];
+                        const scalar alphafaceI = alphaf.boundaryField()[patchI][bfaceI];
+                        const scalar alphaPhiFaceI = alphaPhi.boundaryField()[patchI][bfaceI];
+                        Cf.boundaryFieldRef()[patchI][bfaceI] = interpolateFaceConcentrationOnFaceI(alphafaceI, COwn, CNei, alphaOwn, alphaNei, alphaPhiFaceI);
+                    }
+                    // else // to be implemented
+                    // {
+                    //     Cf.boundaryFieldRef()[patch][bfaceI] = alphaf.boundaryField()[patch][bfaceI]*C.primitiveField()[faceCells[bFaceI]]/alpha.primitiveField()[cellI];
+                    // }
+                }
+            }
+        }
+    }
+}
+
 }
 
 

@@ -252,7 +252,7 @@ forAll(c1Ptr,ci)
         (
             IOobject
             (
-                specieNames[ci] + "_1",
+                specieNames[ci] + "." + mixture.phase1Name(),
                 runTime.timeName(),
                 mesh,
                 IOobject::MUST_READ,
@@ -269,7 +269,7 @@ forAll(c1Ptr,ci)
         (
             IOobject
             (
-                specieNames[ci] + "_2",
+                specieNames[ci] + "." + mixture.phase2Name(),
                 runTime.timeName(),
                 mesh,
                 IOobject::MUST_READ,
@@ -279,7 +279,6 @@ forAll(c1Ptr,ci)
         )
     );
 
-    
     //- Read diffusion coefficients
     D1Ptr.set
     (

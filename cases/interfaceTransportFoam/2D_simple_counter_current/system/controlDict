@@ -1,0 +1,85 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2406                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     interfaceTransportFoam;
+
+startFrom       startTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         50;
+
+deltaT          1e-7;
+
+writeControl    adjustableRunTime;
+
+writeInterval   1;
+
+purgeWrite      0;
+
+writeFormat     ascii;
+
+writePrecision  6;
+
+compression     off;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable yes;
+
+adjustTimeStep  yes;
+
+maxDeltaT       1e-1;
+
+maxCo           0.05;
+maxAlphaCo      0.05;
+maxAlphaDdt     1;
+
+functions
+{
+
+    outletValues
+    {
+        writeControl    timeStep;
+        writeInterval   1;
+
+        // Mandatory entries (unmodifiable)
+        type            surfaceFieldValue;
+        libs            (fieldFunctionObjects);
+
+        // Mandatory entries (runtime modifiable)
+        fields          (c.mobile alpha.stationary);
+        operation       areaAverage;
+        regionType      patch;
+        name            outlet;
+        writeFields true;
+
+
+        postOperation   none;
+        scaleFactor     1.0;
+        writeArea       true;
+        surfaceFormat   none;
+    }
+
+
+}
+
+
+// ************************************************************************* //
