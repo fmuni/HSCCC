@@ -11,7 +11,7 @@
     alphaPhi = advector.alphaPhi();
 
     // area of the face immersed in the liquid / total area of the face
-    alphaf = alphaPhi/stabilise(phi.oldTime(), SMALL);
+    alphaf = alphaPhi/stabilise(phi, SMALL);
 
     // area of the face immersed in the gas / total area of the face
     alpha2f = 1 - alphaf;
@@ -49,7 +49,9 @@
         =======================================================================*/
 
         volScalarField& C1 = c1Ptr[ci];
-        volScalarField& C2 = c1Ptr[ci];
+        volScalarField& C2 = c2Ptr[ci];
+        volScalarField& C11 = c11Ptr[ci];
+        volScalarField& C22 = c22Ptr[ci];
 
         Info << "Advecting fields " << C1.name() << ", " << C2.name() << endl;
 
@@ -91,30 +93,28 @@
         volScalarField C2Star = C2 - fvc::surfaceIntegrate(phi*Cf2) * runTime.deltaT();
 
         //- Compute temporary phase averages
-        volScalarField C11Star = C1Star;
-        volScalarField C22Star = C2Star;
         
-        forAll(C11Star, cellI)
+        forAll(C11, cellI)
         {
-            if ( alpha1[cellI]  < 1e-12 )
+            if ( alpha1[cellI]  < 1e-3 )
             {
-                C11Star[cellI] = 0.;
+                C11[cellI] = 0.;
             }
             else
             {
-                C11Star[cellI] = C1Star[cellI] / alpha1[cellI];
+                C11[cellI] = C1Star[cellI] / alpha1[cellI];
             }
         }
 
-        forAll(C22Star, cellI)
+        forAll(C22, cellI)
         {
-            if ( alpha2[cellI] < 1e-12 )
+            if ( alpha2[cellI] < 1e-3 )
             {
-                C22Star[cellI] = 0.;
+                C22[cellI] = 0.;
             }
             else
             {
-                C22Star[cellI] = C2Star[cellI] / alpha2[cellI];
+                C22[cellI] = C2Star[cellI] / alpha2[cellI];
             }
         }
 
@@ -124,8 +124,8 @@
         
         //- The saturation should be limited between 0 an 1
         // TODO: Check if the interface transfer leads to different values
-        volScalarField saturation1 = C11Star;
-        volScalarField saturation2 = C22Star;
+        volScalarField saturation1 = C11;
+        volScalarField saturation2 = C22;
 
         //- Compute the error by interpolating the saturations using the modified upwind schemes
         surfaceScalarField advectionError1 = alphaf;
@@ -144,12 +144,12 @@
         {
             if (advectionError1[faceI] < 1e-08)
             {
-                // This means that C11Star < 0, which is not possible. Limit flux to zero.
+                // This means that C11 < 0, which is not possible. Limit flux to zero.
                 advectionCorrection1[faceI] = 0;
             }
             else if (advectionError1[faceI] > alphaf[faceI] )
             {
-                // This will always reduce the flux because it means that C11Star/Csat > 1
+                // This will always reduce the flux because it means that C11/Csat > 1
                 advectionCorrection1[faceI] = alphaf[faceI] / advectionError1[faceI];
             }
             else
@@ -163,12 +163,12 @@
         {
             if (advectionError2[faceI] < 1e-08)
             {
-                // This means that C11Star < 0, which is not possible. Limit flux to zero.
+                // This means that C11 < 0, which is not possible. Limit flux to zero.
                 advectionCorrection2[faceI] = 0;
             }
             else if (advectionError2[faceI] > alpha2f[faceI] )
             {
-                // This will always reduce the flux because it means that C11Star/Csat > 1
+                // This will always reduce the flux because it means that C11/Csat > 1
                 advectionCorrection2[faceI] = alpha2f[faceI] / advectionError2[faceI];
             }
             else
@@ -190,35 +190,35 @@
         C2 = C2 - fvc::surfaceIntegrate(phi*Cf2) * runTime.deltaT();
 
         //- Recompute phase average values
-        // forAll(C11Star, cellI)
-        // {
-        //     if ( alpha1[cellI]  < 1e-12 )
-        //     {
-        //         C11Star[cellI] = 0.;
-        //     }
-        //     else
-        //     {
-        //         C11Star[cellI] = C1[cellI] / alpha1[cellI];
-        //     }
-        // }
+        forAll(C11, cellI)
+        {
+            if ( alpha1[cellI]  < 1e-12 )
+            {
+                C11[cellI] = 0.;
+            }
+            else
+            {
+                C11[cellI] = C1[cellI] / alpha1[cellI];
+            }
+        }
 
-        // forAll(C22Star, cellI)
-        // {
-        //     if ( alpha2[cellI] < 1e-12 )
-        //     {
-        //         C22Star[cellI] = 0.;
-        //     }
-        //     else
-        //     {
-        //         C22Star[cellI] = C2[cellI] / alpha2[cellI];
-        //     }
-        // }
+        forAll(C22, cellI)
+        {
+            if ( alpha2[cellI] < 1e-12 )
+            {
+                C22[cellI] = 0.;
+            }
+            else
+            {
+                C22[cellI] = C2[cellI] / alpha2[cellI];
+            }
+        }
 
 
-        // //- Use phase averages to recompute values
-        // //- This can remove some ill behaved cells
-        // C1 = C11Star * alpha1;
-        // C2 = C22Star * alpha2;
+        //- Use phase averages to recompute values
+        //- This can remove some ill behaved cells but makes the method non-conservative
+        // C1 = C11 * alpha1;
+        // C2 = C22 * alpha2;
 
         C1.correctBoundaryConditions();
         C2.correctBoundaryConditions();

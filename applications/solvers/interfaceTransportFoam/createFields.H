@@ -232,6 +232,8 @@ List<word> specieNames(mixture.get<List<word>>("species"));
 //- Pointers to species fields, diffusion coefficients, and Henry constants
 PtrList<volScalarField>     c1Ptr(specieNames.size()); // Species in liquid 1
 PtrList<volScalarField>     c2Ptr(specieNames.size()); // Species in liquid 2
+PtrList<volScalarField>     c11Ptr(specieNames.size()); // Species in liquid 1 averaged in phase 1
+PtrList<volScalarField>     c22Ptr(specieNames.size()); // Species in liquid 2 averaged in phase 2
 PtrList<dimensionedScalar>  D1Ptr(specieNames.size()); // Diffusion coefficient 1
 PtrList<dimensionedScalar>  D2Ptr(specieNames.size()); // Diffusion coefficient 2
 PtrList<dimensionedScalar>  KPtr(specieNames.size()); // Partition coefficient
@@ -276,6 +278,40 @@ forAll(c1Ptr,ci)
                 IOobject::AUTO_WRITE
             ),
             mesh
+        )
+    );
+
+    c11Ptr.set
+    (
+        ci,
+        new volScalarField
+        (
+            IOobject
+            (
+                specieNames[ci] + "_ave." + mixture.phase1Name(),
+                runTime.timeName(),
+                mesh,
+                IOobject::NO_READ,
+                IOobject::AUTO_WRITE
+            ),
+            c1Ptr[ci]
+        )
+    );
+
+    c22Ptr.set
+    (
+        ci,
+        new volScalarField
+        (
+            IOobject
+            (
+                specieNames[ci] + "_ave." + mixture.phase2Name(),
+                runTime.timeName(),
+                mesh,
+                IOobject::NO_READ,
+                IOobject::AUTO_WRITE
+            ),
+            c2Ptr[ci]
         )
     );
 
