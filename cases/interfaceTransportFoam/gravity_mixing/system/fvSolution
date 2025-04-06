@@ -58,7 +58,7 @@ solvers
         relTol          0;
     }
 
-    "A|B|U|UFinal|AFinal|BFinal"
+    "C.*|U|UFinal|AFinal|BFinal"
     {
         solver          PBiCGStab;
         preconditioner  DILU;
