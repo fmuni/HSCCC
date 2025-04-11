@@ -25,8 +25,8 @@
         )
     );
 
-    surfaceInterpolationScheme<scalar>& divScheme1 = tdivScheme1();
-    surfaceInterpolationScheme<scalar>& divScheme2 = tdivScheme2();
+    const surfaceInterpolationScheme<scalar>& divScheme1 = tdivScheme1();
+    const surfaceInterpolationScheme<scalar>& divScheme2 = tdivScheme2();
 
     forAll(c1Ptr, ci)
     {
