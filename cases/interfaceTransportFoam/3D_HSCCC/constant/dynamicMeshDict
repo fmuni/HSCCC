@@ -1,0 +1,142 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2406                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      dynamicMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dynamicFvMesh   staticFvMesh;
+
+motionSolver    coded;
+name            planetaryMotionXY; // Planetary motion in the XY-plane
+
+codeInclude
+#{
+    #include "transformField.H"
+#};
+
+localCode
+#{
+    // Rotate a point in the XY plane
+    inline vector rotatePointXY
+    ( 
+        const vector& p,
+        const scalar& theta,
+        const vector& rotCenter
+    )
+    {
+        vector pRel = p - rotCenter;
+        vector pNew = p;
+        
+        pNew.x() = pRel.x()*cos(theta) - pRel.y()*sin(theta);
+        pNew.y() = pRel.x()*sin(theta) + pRel.y()*cos(theta);
+        
+        return pNew + rotCenter;
+    }
+    
+    // Rotate pointField in the XY plane
+    void rotatePointField
+    (
+        pointField& points,
+        const scalar& theta,
+        const vector& rotCenter
+    )
+    {
+        forAll(points, pointI)
+        {         
+            points[pointI] = rotatePointXY(points[pointI],theta,rotCenter);
+        }  
+    }
+    
+    
+    // Compute the rotation speed
+    scalar Omega
+    (
+        const scalar& Omega0,
+        const scalar& t,
+        const scalar& t_su,
+        const scalar& t_sd,
+        const scalar& t_simEnd        
+    )
+    {
+        //- Shutdown coefficient
+        scalar deltaTEnd = t_simEnd - t;
+        scalar deltaTSD = max(t_simEnd - t_sd,1e-6);
+        scalar sd_coeff = max(min(deltaTEnd/deltaTSD, 1.0), 0.);
+        
+        // Startup coefficient
+        scalar su_coeff = min(t/(t_su + 1e-6), 1.0);
+        
+        return Omega0 * su_coeff; // * sd_coeff; 
+    }
+    
+    // Generate new set of points
+    tmp<pointField> planetaryMotion
+    (
+        const scalar& solarAngle,
+        const vector& solarCenter,
+        const vector& planetInitialCenter,
+        const pointField& points
+    )
+    {
+        auto tnewPoints = tmp<pointField>::New(points);
+        auto& newPoints = tnewPoints.ref();
+
+        // Rotate around planet axis
+        rotatePointField(newPoints,2*solarAngle,planetInitialCenter); 
+        
+        // Compute new planet center
+        const vector planetCenter = rotatePointXY(planetInitialCenter,solarAngle,solarCenter);
+
+	newPoints += (planetCenter - planetInitialCenter);       
+       
+        
+        return tnewPoints;
+    }
+#};
+
+code
+#{
+    const scalar omega0RPM = 800; // RPM
+    const scalar t_su =  0.1;
+    const scalar t_sd =  1.0;
+    const scalar t_sd_end = 5.0; // Allows to continue the simulation at 0 RPM
+    const vector solarCenter = vector(-0.1,0,0);
+    const vector planetInitialCenter = vector(0,0,0);
+    
+    const Time& tm = mesh().time();
+    const pointField& p0 = points0();
+    
+    const scalar omega0 = omega0RPM/60.;
+    
+    const scalar omega = Omega
+    (
+        omega0, 
+        tm.value(), 
+        t_su, 
+        t_sd, 
+        //mesh().time().endTime().value()
+        t_sd_end
+    );
+    
+    Info << "Planetary motion: omega = " << omega << "\n";
+
+    // Solar rotation angle
+    const scalar solarAngle =
+        constant::mathematical::twoPi*omega*tm.value();
+ 
+
+    return planetaryMotion(solarAngle, solarCenter, planetInitialCenter, p0);
+#};
+
+
+// ************************************************************************* //
