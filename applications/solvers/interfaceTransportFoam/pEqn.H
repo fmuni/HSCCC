@@ -33,6 +33,11 @@
         )*rAUf*mesh.magSf()
     );
 
+    if(facePlanetaryForce)
+    {
+        phig += rAUf*phiFP;
+    }
+
     phiHbyA += phig;
 
     // Update the pressure BCs to ensure flux consistency

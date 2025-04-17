@@ -365,3 +365,78 @@ forAll(c1Ptr,ci)
 
 }
 
+
+/* Read controls for planetary MRF */
+
+Info<< "Reading planetaryMRFDict\n" << endl;
+
+IOdictionary pMRFDict
+(
+    IOobject
+    (
+        "planetaryMRFDict",
+        runTime.constant(),
+        mesh,
+        IOobject::MUST_READ_IF_MODIFIED,
+        IOobject::NO_WRITE
+    )
+);
+
+dimensionedVector OmegaZero
+(
+    "Omega",
+    dimless/dimTime,
+    pMRFDict.get<vector>("Omega")
+);
+
+dimensionedScalar Rs
+(
+    "Rs",
+    dimLength,
+    pMRFDict.get<scalar>("solarRadius")
+);
+
+dimensionedVector Xp
+(
+    "Xp",
+    dimLength,
+    pMRFDict.get<vector>("planetDistance")
+);
+
+// dimensionedScalar Rp
+// (
+//     "Rp",
+//     dimLength,
+//     pMRFDict.get<scalar>("planetaryRadius")
+// );
+
+
+dimensionedScalar rumpTime
+(
+    "rumpTime",
+    dimTime,
+    pMRFDict.get<scalar>("rumpTime")
+);
+
+volVectorField F_planetary
+(
+    IOobject
+    (
+        "F_planetary",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    mesh,
+    dimensionedVector("Fp",dimForce/dimVolume,vector::zero)    
+);
+
+bool facePlanetaryForce = false;
+
+if( pMRFDict.found("facePlanetaryForce") )
+{
+    facePlanetaryForce = pMRFDict.get<bool>("facePlanetaryForce");
+}
+
+surfaceScalarField phiFP = fvc::flux(F_planetary);

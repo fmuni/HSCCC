@@ -26,6 +26,7 @@ Description
 #include "fvcSmooth.H"
 #include "dynamicRefineFvMesh.H"
 #include "phaseGaussConvectionScheme.H"
+#include <math.h>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

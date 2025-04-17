@@ -1,3 +1,4 @@
+if (specieNames.size() > 0)
 {
     boolList interfaceCells = advector.surf().interfaceCell();
     alphaPhi = advector.alphaPhi();
