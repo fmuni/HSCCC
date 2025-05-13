@@ -61,7 +61,7 @@ phaseGaussConvectionScheme<Type>::phaseAverage
         }
     }
 
-    vfave.correctBoundaryConditions;
+    vfave.correctBoundaryConditions();
 
     return vfave;
 }
@@ -83,7 +83,7 @@ phaseGaussConvectionScheme<Type>::interpolate
 ) const
 {
 
-    GeometricField<Type, fvPatchField, volMesh> vfave = phaseAverage(vf,alpha_,scalar(1e-4));
+    GeometricField<Type, fvPatchField, volMesh> vfave = phaseAverage(vf,scalar(1e-4));
 
     return tinterpScheme_().interpolate(vfave)*alphaf_;
 }
@@ -97,7 +97,7 @@ phaseGaussConvectionScheme<Type>::flux
     const GeometricField<Type, fvPatchField, volMesh>& vf
 ) const
 {
-    GeometricField<Type, fvPatchField, volMesh> vfave = phaseAverage(vf,alpha_,scalar(1e-4));
+    GeometricField<Type, fvPatchField, volMesh> vfave = phaseAverage(vf,scalar(1e-4));
     return alphaPhi*tinterpScheme_().interpolate(vfave);
 }
 
@@ -161,7 +161,7 @@ phaseGaussConvectionScheme<Type>::fvmDiv
 
     fvm.negSumDiag();
 
-    GeometricField<Type, fvPatchField, volMesh> vfave = phaseAverage(vf,alpha_,scalar(1e-4));
+    GeometricField<Type, fvPatchField, volMesh> vfave = phaseAverage(vf,scalar(1e-4));
     forAll(vf.boundaryField(), patchi)
     {
         const fvPatchField<Type>& psf = vfave.boundaryField()[patchi];
@@ -201,7 +201,6 @@ phaseGaussConvectionScheme<Type>::fvcDiv
 
     return tConvection;
 }
-
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

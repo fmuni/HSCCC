@@ -1,4 +1,4 @@
-phaseGaussConvectionScheme.C
+
 interfaceTransportFoam.C
 
 EXE = $(FOAM_USER_APPBIN)/interfaceTransportFoam

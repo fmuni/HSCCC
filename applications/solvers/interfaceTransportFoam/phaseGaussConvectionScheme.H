@@ -28,7 +28,7 @@ class phaseGaussConvectionScheme
         tmp<surfaceInterpolationScheme<Type>> tinterpScheme_;
 
         const volScalarField&       alpha_;
-        const volScalarField&       alphaf_;
+        const surfaceScalarField&       alphaf_;
 
 
     // Private Member Functions
