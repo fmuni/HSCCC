@@ -50,6 +50,9 @@ castellatedMeshControls
             }
         }
     }
+    
+    refinementRegions
+    {}
 
 
     locationInMesh (1e-5 1e-5 1e-5);

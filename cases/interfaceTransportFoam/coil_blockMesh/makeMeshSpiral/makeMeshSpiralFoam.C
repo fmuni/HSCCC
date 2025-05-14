@@ -42,8 +42,8 @@ int main(int argc, char *argv[])
         
         scalar theta = p.z()/(R);
         
-        pNew[0] = (R + p[0])*Foam::cos(theta);
-        pNew[1] = (R + p[0])*Foam::sin(theta);
+        pNew[1] = (R + p[0])*Foam::cos(theta);
+        pNew[0] = (R + p[0])*Foam::sin(theta);
         pNew[2] = p[1] + theta*pOverTwoPi;
         p = pNew;
         

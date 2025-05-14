@@ -96,5 +96,6 @@ snappyHexMesh -overwrite
 makeMeshSpiralFoam
 mv 0/polyMesh/points constant/polyMesh/points
 rm -rf 0
+checkMesh -allGeometry -allTopology
 
 
