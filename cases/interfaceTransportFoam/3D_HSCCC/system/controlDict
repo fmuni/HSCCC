@@ -29,7 +29,7 @@ deltaT          1e-7;
 
 writeControl    adjustable;
 
-writeInterval   0.005;
+writeInterval   0.001;
 
 purgeWrite      0;
 
