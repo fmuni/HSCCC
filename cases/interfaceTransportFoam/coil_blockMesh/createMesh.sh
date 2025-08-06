@@ -5,8 +5,9 @@
 RADIUS=0.0016  # Radius of the cylinder
 r=0.05 # Radius of the coil
 PI=3.14159265359 # Pi value
-HEIGHT=$(echo "2*$r*$PI" | bc -l) # Height of the cylinder
-NR=6
+NCOILS=3 # Number of coils
+HEIGHT=$(echo "2*$r*$PI*$NCOILS" | bc -l) # Height of the cylinder
+NR=12
 NZ=$(echo "0.5*$NR*$HEIGHT/$RADIUS" | bc -l)
 # Cylinder controls
 SEGMENTS=36 # Number of segments for the circle approximation
