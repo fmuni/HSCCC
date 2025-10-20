@@ -27,6 +27,7 @@ Description
 #include "dynamicRefineFvMesh.H"
 #include "phaseGaussConvectionScheme.H"
 #include <math.h>
+#include "computePlanetaryAcceleration.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

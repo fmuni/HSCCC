@@ -271,12 +271,12 @@ if (specieNames.size() > 0)
         {
             label cellI = interfaceCells[Icell];
 
-            if(alpha1[cellI] > 1e-3 && alpha2[cellI] > 1e-3)
+          //  if(alpha1[cellI] > 1e-3 && alpha2[cellI] > 1e-3)
             {
-                a1[cellI] += Lambda[cellI] / alpha1[cellI];
-                s1[cellI] += K.value()*Lambda[cellI]*C22[cellI]; 
-                a2[cellI] += K.value()*Lambda[cellI] / alpha2[cellI];
-                s2[cellI] += Lambda[cellI]*C11[cellI]; 
+                a1[cellI] += Lambda[cellI];// / alpha1[cellI];
+                s1[cellI] += K.value()*Lambda[cellI]*C2[cellI]; 
+                a2[cellI] += K.value()*Lambda[cellI];// / alpha2[cellI];
+                s2[cellI] += Lambda[cellI]*C1[cellI]; 
 
             }
                 // scalar a1o = a1[cellI];

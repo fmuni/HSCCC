@@ -15,12 +15,10 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-Omega (0 0 100);
+omega 800;
 
 solarRadius 0.1;
 
 planetDistance (0 0 0);
-
-rumpTime  -1.0;
 
 facePlanetaryForce true;

@@ -382,13 +382,6 @@ IOdictionary pMRFDict
     )
 );
 
-dimensionedVector OmegaZero
-(
-    "Omega",
-    dimless/dimTime,
-    pMRFDict.get<vector>("Omega")
-);
-
 dimensionedScalar Rs
 (
     "Rs",
@@ -403,20 +396,7 @@ dimensionedVector Xp
     pMRFDict.get<vector>("planetDistance")
 );
 
-// dimensionedScalar Rp
-// (
-//     "Rp",
-//     dimLength,
-//     pMRFDict.get<scalar>("planetaryRadius")
-// );
-
-
-dimensionedScalar rumpTime
-(
-    "rumpTime",
-    dimTime,
-    pMRFDict.get<scalar>("rumpTime")
-);
+autoPtr<Function1<scalar>> omegaPtr = Function1<scalar>::New("omega",pMRFDict);
 
 volVectorField F_planetary
 (
@@ -429,7 +409,7 @@ volVectorField F_planetary
         IOobject::AUTO_WRITE
     ),
     mesh,
-    dimensionedVector("Fp",dimForce/dimVolume,vector::zero)    
+    dimensionedVector("Fp",dimForce/dimVolume,vector::zero)
 );
 
 bool facePlanetaryForce = false;

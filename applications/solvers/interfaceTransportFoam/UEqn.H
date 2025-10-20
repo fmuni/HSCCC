@@ -1,7 +1,7 @@
     MRF.correctBoundaryVelocity(U);
 
     #include "computePlanetaryForce.H"
-    
+
     fvVectorMatrix UEqn
     (
         fvm::ddt(rho, U) + fvm::div(rhoPhi, U)
@@ -38,7 +38,7 @@
                       - fvc::snGrad(p_rgh)
                     ) * mesh.magSf()
                 )
-            );    
+            );
         }
         else
         {
@@ -55,7 +55,7 @@
                     ) * mesh.magSf()
                     + phiFP
                 )
-            );             
+            );
         }
         fvOptions.correct(U);
     }
