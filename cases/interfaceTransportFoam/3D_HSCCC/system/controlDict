@@ -23,13 +23,13 @@ startTime       0;
 
 stopAt          endTime;
 
-endTime         10;
+endTime         60;
 
-deltaT          1e-7;
+deltaT          1e-10;
 
 writeControl    adjustable;
 
-writeInterval   0.001;
+writeInterval   0.5;
 
 purgeWrite      0;
 
@@ -41,15 +41,15 @@ writeCompression off;
 
 timeFormat      general;
 
-timePrecision   6;
+timePrecision   12;
 
 runTimeModifiable no;
 
 adjustTimeStep  yes;
 
-maxCo          1;
+maxCo          0.9;
 
-maxAlphaCo      0.1;
+maxAlphaCo      0.9;
 
 maxDeltaT       1e-2;
 
@@ -76,6 +76,26 @@ functions
         writeControl    timeStep;
         writeInterval   1;
     }
+    
+    volFieldValue1
+    {
+        // Mandatory entries (unmodifiable)
+        type            volFieldValue;
+        libs            (fieldFunctionObjects);
+
+        // Mandatory entries (runtime modifiable)
+        fields          (alpha.organic);
+        operation       volAverage;
+        regionType      all;
+        writeToFile     true;
+        writeFields     false;
+        executeControl  runTime;
+        executeInterval 0.01;
+        writeControl    runTime;
+        writeInterval   0.01;      
+        
+    }
+
 }
 
 // ************************************************************************* //
