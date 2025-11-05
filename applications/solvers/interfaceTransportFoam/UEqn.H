@@ -8,13 +8,13 @@
       + MRF.DDt(rho, U)
       + turbulence->divDevRhoReff(rho, U)
      ==
-        fvOptions(rho, U)
+        (
+            (facePlanetaryForce) ?
+            fvOptions(rho,U)
+            :
+            F_planetary + fvOptions(rho,U)
+        )
     );
-
-    if(!facePlanetaryForce)
-    {
-        UEqn += F_planetary;
-    }
 
     #include "UEqnAddPorosity.H"
 
@@ -24,38 +24,22 @@
 
     if (pimple.momentumPredictor())
     {
-        if(!facePlanetaryForce)
-        {
-            solve
+        surfaceScalarField UForceFace
+        (
             (
-                UEqn
-             ==
-                fvc::reconstruct
-                (
-                    (
-                        mixture.surfaceTensionForce()
-                      - ghf*fvc::snGrad(rho)
-                      - fvc::snGrad(p_rgh)
-                    ) * mesh.magSf()
-                )
-            );
-        }
-        else
+                mixture.surfaceTensionForce()
+              - ghf*fvc::snGrad(rho)
+              - fvc::snGrad(p_rgh)
+            ) * mesh.magSf()
+
+        );
+
+        if (facePlanetaryForce)
         {
-            solve
-            (
-                UEqn
-             ==
-                fvc::reconstruct
-                (
-                    (
-                        mixture.surfaceTensionForce()
-                      - ghf*fvc::snGrad(rho)
-                      - fvc::snGrad(p_rgh)
-                    ) * mesh.magSf()
-                    + phiFP
-                )
-            );
+            UForceFace += phiFP;
         }
+
+        solve (UEqn == fvc::reconstruct(UForceFace));
+
         fvOptions.correct(U);
     }

@@ -14,6 +14,7 @@ Description
 #include "fvCFD.H"
 #include "dynamicFvMesh.H"
 #include "isoAdvection.H"
+#include "CMULES.H"
 #include "EulerDdtScheme.H"
 #include "localEulerDdtScheme.H"
 #include "CrankNicolsonDdtScheme.H"
@@ -51,6 +52,7 @@ int main(int argc, char *argv[])
     #include "createFields.H"
     #include "initCorrectPhi.H"
     #include "createUfIfPresent.H"
+    #include "createAlphaFluxes.H"
 
     #include "porousCourantNo.H"
     #include "setInitialDeltaT.H"
@@ -125,7 +127,15 @@ int main(int argc, char *argv[])
             }
 
             #include "alphaControls.H"
-            #include "alphaEqnSubCycle.H"
+
+            if (algebraicVOF)
+            {
+                #include "alphaEqnSubCycle_MULES.H"
+            }
+            else
+            {
+                #include "alphaEqnSubCycle.H"
+            }
 
             interfaceCenters = advector.surf().centre();
             interfaceNormals = advector.surf().normal();

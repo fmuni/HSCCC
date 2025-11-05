@@ -1,0 +1,101 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2406                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     interIsoFoam;
+
+startFrom       latestTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         60;
+
+deltaT          1e-10;
+
+writeControl    timeStep;
+
+writeInterval   200;
+
+purgeWrite      0;
+
+writeFormat     ascii;
+
+writePrecision  6;
+
+writeCompression off;
+
+timeFormat      general;
+
+timePrecision   12;
+
+runTimeModifiable no;
+
+adjustTimeStep  yes;
+
+maxCo          0.9;
+
+maxAlphaCo      0.05;
+
+maxDeltaT       0.1;
+
+functions
+{
+    fieldMinMax1
+    {
+        // Mandatory entries (unmodifiable)
+        type        fieldMinMax;
+        libs        (fieldFunctionObjects);
+
+        // Mandatory entries (runtime modifiable)
+        mode        magnitude;
+        fields      (U p_rgh);
+
+        // Optional entries (runtime modifiable)
+        location    true;
+
+        // Optional (inherited) entries
+        writePrecision  8;
+        writeToFile     false;
+        executeControl  timeStep;
+        executeInterval 1;
+        writeControl    timeStep;
+        writeInterval   1;
+    }
+    
+    volFieldValue1
+    {
+        // Mandatory entries (unmodifiable)
+        type            volFieldValue;
+        libs            (fieldFunctionObjects);
+
+        // Mandatory entries (runtime modifiable)
+        fields          (alpha.organic);
+        operation       volAverage;
+        regionType      all;
+        writeToFile     true;
+        writeFields     false;
+        executeControl  runTime;
+        executeInterval 0.5;
+        writeControl    runTime;
+        writeInterval   0.5;      
+        
+    }
+
+}
+
+// ************************************************************************* //
