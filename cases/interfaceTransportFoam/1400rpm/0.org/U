@@ -31,7 +31,7 @@ boundaryField
     {
         //type            movingWallVelocity;
         type fixedValue;
-	value           uniform (0.1 0 0);
+	value           uniform (0.02 0 0);
     }
 
     outlet

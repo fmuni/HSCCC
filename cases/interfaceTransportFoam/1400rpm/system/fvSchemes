@@ -27,11 +27,8 @@ gradSchemes
 
 divSchemes
 {
-    div(rhoPhi,U)   Gauss upwind;
+    div(rhoPhi,U)    Gauss limitedLinearV 1;
     div(((rho*nuEff)*dev2(T(grad(U))))) Gauss linear;
-    div(phirb,alpha) Gauss linear;
-    div(phi,alpha) Gauss upwind;
-
 }
 
 laplacianSchemes
@@ -54,7 +51,7 @@ fluxRequired
     default          no;
     p_rgh;
     pcorr;
-    alpha.aqueous;
+    alpha.water;
 }
 
 

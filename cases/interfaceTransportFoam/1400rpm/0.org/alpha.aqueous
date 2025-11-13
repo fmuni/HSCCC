@@ -18,14 +18,35 @@ FoamFile
 
 dimensions      [0 0 0 0 0 0 0];
 
-internalField   uniform 0;
+internalField   uniform 1;
 
 boundaryField
 {
-    inlet
-    {
-        type            fixedValue;
-        value           uniform 0;
+   inlet
+   {
+        type    codedFixedValue;
+        value   uniform 1;
+        name    instep;   // name of generated BC
+
+        code
+        #{
+            scalar timeStart(0.214285714);
+            if(this->db().time().value() > timeStart)
+            {
+                operator==(0);
+            }
+            
+        #};
+
+        //codeInclude
+        //#{
+        //    #include "fvCFD.H"
+        //#};
+
+        //codeOptions
+        //#{
+        //    -I$(LIB_SRC)/finiteVolume/lnInclude
+        //#};
     }
     outlet
     {
