@@ -35,7 +35,7 @@
 
     if(facePlanetaryForce)
     {
-        phig += rAUf*phiFP;
+        phig += rAUf*phiFPrelax;
     }
 
     phiHbyA += phig;

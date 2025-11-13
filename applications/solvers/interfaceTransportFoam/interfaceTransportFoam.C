@@ -147,6 +147,10 @@ int main(int argc, char *argv[])
                 continue;
             }
 
+            #include "computePlanetaryForce.H"
+
+            phiFPrelax = phiFPrelax*(1. - omegap) + phiFP * omegap;
+
             #include "UEqn.H"
             #include "cEqn.H"
 

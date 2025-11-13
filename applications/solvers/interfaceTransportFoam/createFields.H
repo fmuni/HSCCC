@@ -396,6 +396,8 @@ dimensionedVector Xp
     pMRFDict.get<vector>("planetDistance")
 );
 
+scalar omegap( pMRFDict.get<scalar>("relaxationFactor"));
+
 autoPtr<Function1<scalar>> omegaPtr = Function1<scalar>::New("omega",pMRFDict);
 
 volVectorField F_planetary
@@ -420,3 +422,4 @@ if( pMRFDict.found("facePlanetaryForce") )
 }
 
 surfaceScalarField phiFP = fvc::flux(F_planetary);
+surfaceScalarField phiFPrelax = phiFP;
