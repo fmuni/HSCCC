@@ -155,10 +155,24 @@ int main(int argc, char *argv[])
             #include "cEqn.H"
 
             // --- Pressure corrector loop
-            while (pimple.correct())
+            label corrPISO = 1;
+            while (corrPISO <= pimple.nCorrPISO())
             {
                 #include "pEqn.H"
+
+                if (mag(sumLocalContErr) < contErrTolPISO)
+                {
+                    Info<< "PISO converged" << endl;
+                    break;
+                }
+
+                corrPISO++;
+
             }
+
+            cumulativeContErr += globalContErr;
+            Info<< "Cumulative continuity errors= " << cumulativeContErr
+                << endl;
 
             if (pimple.turbCorr())
             {

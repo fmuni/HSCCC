@@ -423,3 +423,7 @@ if( pMRFDict.found("facePlanetaryForce") )
 
 surfaceScalarField phiFP = fvc::flux(F_planetary);
 surfaceScalarField phiFPrelax = phiFP;
+
+scalar globalContErr = 0;
+scalar sumLocalContErr = 0;
+scalar contErrTolPISO = pimple.dict().getOrDefault<scalar>("contErrTolPISO", 0.);
