@@ -1,3 +1,0 @@
-speciesTransportIsoFoam.C
-
-EXE = $(FOAM_USER_APPBIN)/speciesTransportIsoFoam

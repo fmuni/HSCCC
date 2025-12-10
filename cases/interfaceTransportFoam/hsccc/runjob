@@ -1,0 +1,13 @@
+#!/bin/bash
+#SBATCH --job-name=bpms_vel
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=48
+#SBATCH --time=48:00:00
+#SBATCH --account=bpms
+#SBATCH --dependency=singleton
+##SBATCH --partition=debug
+
+module load openfoam/v2406-craympich-gcc
+
+srun -n 48 --cpu_bind=cores -K1 interfaceTransportFoam -parallel # -fileHandler collated
+reconstructPar -newTimes
