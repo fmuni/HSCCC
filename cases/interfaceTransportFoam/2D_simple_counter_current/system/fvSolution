@@ -27,6 +27,8 @@ solvers
         reconstructionScheme isoAlpha;
         writeFields     true;
         nAlphaSmoothIterations 1;
+        nAlphaCorr 0;
+        algebraicVOF false;
 
         nAlphaSubCycles 1;
         cAlpha          1; // Note: cAlpha is not used by isoAdvector but must
@@ -60,7 +62,8 @@ solvers
 
     "C.*|U|UFinal|AFinal|BFinal"
     {
-        solver          PBiCGStab;
+        solver          GAMG;
+        smoother        GaussSeidel;
         preconditioner  DILU;
         tolerance       1e-06;
         relTol          0;

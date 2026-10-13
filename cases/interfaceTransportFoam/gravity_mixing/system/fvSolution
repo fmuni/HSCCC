@@ -19,14 +19,16 @@ solvers
 {
     "alpha.*"
     {
-        isoFaceTol      1e-8;
-        surfCellTol     1e-8;
+        isoFaceTol      1e-6;
+        surfCellTol     1e-6;
         nAlphaBounds    3;
         snapTol         1e-12;
         clip            false;
         reconstructionScheme isoAlpha;
         writeFields     true;
         nAlphaSmoothIterations 1;
+        nAlphaCorr 0;
+        algebraicVOF false;
 
         nAlphaSubCycles 1;
         cAlpha          1; // Note: cAlpha is not used by isoAdvector but must
@@ -60,7 +62,8 @@ solvers
 
     "C.*|U|UFinal|AFinal|BFinal"
     {
-        solver          PBiCGStab;
+        solver          GAMG;
+        smoother        GaussSeidel;
         preconditioner  DILU;
         tolerance       1e-06;
         relTol          0;
@@ -75,7 +78,7 @@ PIMPLE
     nOuterCorrectors 1;
     nNonOrthogonalCorrectors 0;
     pRefCell        0;
-    pRefValue       1e5;
+    pRefValue       0;
 }
 
 relaxation

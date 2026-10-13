@@ -41,8 +41,8 @@ C
 
     D.stationary 1e-6;
     D.mobile 1e-6;
-    K   2;
-    kl 1e-5;
+    K   0;
+    kl 0;
 }
 
 

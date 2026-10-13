@@ -22,7 +22,7 @@ startTime       0;
 
 stopAt          endTime;
 
-endTime         50;
+endTime         100;
 
 deltaT          1e-7;
 
@@ -65,7 +65,7 @@ functions
         libs            (fieldFunctionObjects);
 
         // Mandatory entries (runtime modifiable)
-        fields          (c.mobile alpha.stationary);
+        fields          (C.mobile alpha.stationary);
         operation       areaAverage;
         regionType      patch;
         name            outlet;
